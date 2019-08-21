@@ -29,7 +29,7 @@ THE SOFTWARE.
 #elif (F_CPU == 8000000)
 #define BRRL_4800 103
 #define BRRL_9600 52
-#define BRRL_192 26    
+#define BRRL_192 26
 #endif
 
 #define NOP asm("nop");
