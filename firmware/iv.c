@@ -194,6 +194,8 @@ ISR(TIMER0_OVF_vect) {
 volatile uint8_t last_buttonstate = 0, just_pressed = 0, pressed = 0;
 volatile uint8_t buttonholdcounter = 0;
 
+uint8_t last_brightness = 0;
+
 // This interrupt detects switches 1 and 3
 ISR(PCINT2_vect) {
   PCICR = 0;
@@ -319,6 +321,8 @@ ISR(TIMER2_OVF_vect) {
       display[0] &= ~0x2;
 
   }
+
+  update_brightness(time_h, time_m, time_s);
 
   check_alarm(time_h, time_m, time_s);
 
@@ -998,6 +1002,33 @@ void set_timezone(void) {
       if (pressed & 0x4)
         delayms(75);
     }
+  }
+}
+
+void update_brightness(uint8_t hour, uint8_t minute, uint8_t second) {
+  int brightness = 30;
+
+  int day_min = hour * 60 + minute;
+
+  if (day_min <= (DIM_DAWN - DIM_TRANSITION) || day_min >= DIM_DUSK) {
+    brightness = DIM_BRIGHT_NIGHT;
+  } else if (day_min < DIM_DAWN) {
+    brightness = (DIM_TRANSITION - (DIM_DAWN - day_min)) * DIM_DELTA \
+      / DIM_TRANSITION + DIM_BRIGHT_NIGHT;
+  } else if (day_min <= (DIM_DUSK - DIM_TRANSITION)) {
+    brightness = DIM_BRIGHT_DAY;
+  } else if (day_min < DIM_DUSK) {
+    brightness = (DIM_DUSK - day_min) * DIM_DELTA \
+      / DIM_TRANSITION + DIM_BRIGHT_NIGHT;
+  }
+
+  // sanity checking
+  if (brightness > 90) brightness = 90;
+  if (brightness < 30) brightness = 30;
+
+  if (brightness != last_brightness) {
+    OCR0A = brightness;
+    last_brightness = brightness;
   }
 }
 

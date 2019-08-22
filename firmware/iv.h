@@ -67,6 +67,13 @@ THE SOFTWARE.
 #define EE_ZONE_HOUR 13
 #define EE_ZONE_MIN 14
 
+#define DIM_DAWN         10 * 60
+#define DIM_DUSK         20 * 60
+#define DIM_TRANSITION   60 // minutes
+#define DIM_BRIGHT_DAY   90
+#define DIM_BRIGHT_NIGHT 30
+#define DIM_DELTA        (DIM_BRIGHT_DAY - DIM_BRIGHT_NIGHT)
+
 void delay(uint16_t delay);
 
 void (*app_start)(void) = 0x0000;
@@ -86,6 +93,7 @@ void display_timezone(int8_t h, uint8_t m);
 void set_time(void);
 void set_alarm(void);
 void set_date(void);
+void update_brightness(uint8_t h, uint8_t m, uint8_t s);
 void set_brightness(void);
 void set_volume(void);
 void set_region(void);
